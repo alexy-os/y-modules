@@ -10,5 +10,17 @@ export default defineConfig({
     alias: {
       '@y-modules/core': resolve(__dirname, '../../packages/core/src')
     }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html')
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['@y-modules/core']
   }
 }); 
