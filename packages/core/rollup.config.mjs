@@ -8,21 +8,26 @@ export default {
     {
       file: 'dist/index.js',
       format: 'cjs',
-      sourcemap: true
+      sourcemap: true,
+      exports: 'named'
     },
     {
       file: 'dist/index.esm.js',
       format: 'es',
-      sourcemap: true
+      sourcemap: true,
+      exports: 'named'
     }
   ],
   plugins: [
     typescript({
       tsconfig: './tsconfig.json',
       declaration: true,
-      declarationDir: 'dist'
+      declarationDir: 'dist',
+      sourceMap: true
     }),
-    resolve(),
+    resolve({
+      browser: true
+    }),
     commonjs()
   ],
   external: ['react', 'react-dom', 'vue']

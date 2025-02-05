@@ -1,16 +1,25 @@
 {
   "name": "@y-modules/core",
   "version": "0.1.0",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "jest"
+    "test": "bun test",
+    "prepack": "bun run build"
   },
   "publishConfig": {
     "access": "public"
@@ -24,5 +33,11 @@
     "ts-jest": "^29.1.1",
     "typescript": "^5.3.3",
     "tslib": "^2.6.2"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 } 

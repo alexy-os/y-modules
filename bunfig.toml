@@ -1,0 +1,11 @@
+[install]
+peer = true
+production = false
+frozen = false
+
+[test]
+coverage = true
+preload = "./setup.ts"
+
+[install.scopes]
+"@y-modules" = "https://registry.npmjs.org/" 

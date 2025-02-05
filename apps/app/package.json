@@ -2,16 +2,17 @@
   "name": "@y-modules/demo-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "preview": "bunx --bun vite preview"
   },
   "dependencies": {
     "@y-modules/core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^22.13.1",
+    "@types/node": "^20.11.16",
     "typescript": "^5.3.3",
     "vite": "^5.0.12"
   }

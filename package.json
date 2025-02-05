@@ -5,10 +5,14 @@
     "packages/*",
     "apps/*"
   ],
+  "type": "module",
   "scripts": {
-    "build": "pnpm --filter @y-modules/core build && pnpm --filter @y-modules/demo-app build",
-    "test": "pnpm -r test",
-    "dev": "pnpm -r dev"
+    "build": "bun run build:core && bun run build:app",
+    "build:core": "bun run --cwd packages/core build",
+    "build:app": "bun run --cwd apps/app build",
+    "test": "bun test",
+    "dev": "bun run dev:app",
+    "dev:app": "bun run --cwd apps/app dev"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
@@ -17,5 +21,10 @@
     "rollup": "^4.9.6",
     "typescript": "^5.3.3",
     "tslib": "^2.6.2"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.0.26"
 } 
