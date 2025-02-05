@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm build",
+  "buildCommand": "pnpm install --no-frozen-lockfile && cd packages/core && pnpm install --no-frozen-lockfile && cd ../../apps/app && pnpm install --no-frozen-lockfile && cd ../.. && pnpm build",
   "outputDirectory": "apps/app/dist",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "vite",
