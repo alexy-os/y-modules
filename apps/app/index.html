@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DnD Page Builder Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      padding: 20px;
+    }
+
+    .workspace {
+      padding: 40px;
+    }
+
+    .component {
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: move;
+      user-select: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .component:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .component.dragging {
+      opacity: 0.5;
+    }
+
+    .dropzone {
+      min-height: 200px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 8px;
+      background: #fff;
+      padding: 20px;
+      transition: background-color 0.2s;
+    }
+
+    .dropzone.hover {
+      background: #f0f7ff;
+      border-color: #2196f3;
+    }
+
+    .dropped-component {
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <h2>Components</h2>
+      <div class="component" data-type="heading">
+        Heading Component
+      </div>
+      <div class="component" data-type="text">
+        Text Component
+      </div>
+      <div class="component" data-type="button">
+        Button Component
+      </div>
+      <div class="component" data-type="image">
+        Image Component
+      </div>
+    </div>
+    <div class="workspace">
+      <div class="dropzone">
+        Drop components here
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html> 
