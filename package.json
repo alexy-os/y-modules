@@ -8,7 +8,8 @@
   "scripts": {
     "build": "pnpm --filter @y-modules/core build && pnpm --filter @y-modules/demo-app build",
     "test": "pnpm -r test",
-    "dev": "pnpm -r dev"
+    "dev": "pnpm -r dev",
+    "postinstall": "pnpm install --no-frozen-lockfile"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
