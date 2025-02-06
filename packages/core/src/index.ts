@@ -1,11 +1,12 @@
 import { DndManager } from './DndManager';
 import { SortableManager } from './SortableManager';
+import { BlockControls } from './components/BlockControls';
 import type { DraggableConfig, DropZoneConfig } from './types';
 
-// Экспортируем DndManager для возможного прямого использования
+// Экспортируем компоненты
 export { DndManager };
 export { SortableManager };
-
+export { BlockControls };
 // Инициализируем менеджер сразу
 const manager = DndManager.getInstance();
 

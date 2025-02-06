@@ -1,15 +1,69 @@
-import { createDraggable, createDropZone, SortableManager } from '@y-modules/core';
+import { createDraggable, createDropZone, SortableManager, BlockControls } from '@y-modules/core';
 
 interface ComponentData {
   type: string;
   content: string;
 }
 
-const dropzone = document.querySelector<HTMLElement>('.dropzone');
-if (!dropzone) throw new Error('Dropzone not found');
+const dropzoneElement = document.querySelector<HTMLElement>('.dropzone');
+if (!dropzoneElement) {
+  throw new Error('Dropzone element not found');
+}
 
+const dropzone = dropzoneElement; // теперь TypeScript знает, что это не null
 const sortableManager = new SortableManager(dropzone);
 
+function createComponent(payload: ComponentData): HTMLElement {
+  const component = document.createElement('div');
+  component.className = 'dropped-component';
+  component.dataset.type = payload.type;
+  component.innerHTML = `
+    <strong>${payload.type}</strong>
+    <p>${payload.content}</p>
+  `;
+
+  // Добавляем controls
+  const controls = new BlockControls();
+  component.appendChild(controls);
+
+  // Показываем/скрываем controls при наведении
+  component.addEventListener('mouseenter', () => {
+    controls.show();
+  });
+
+  component.addEventListener('mouseleave', () => {
+    controls.hide();
+  });
+
+  // Обрабатываем события controls
+  controls.addEventListener('moveup', () => {
+    const prev = component.previousElementSibling;
+    if (prev) {
+      dropzone.insertBefore(component, prev);
+    }
+  });
+
+  controls.addEventListener('movedown', () => {
+    const next = component.nextElementSibling;
+    if (next) {
+      dropzone.insertBefore(component, next.nextElementSibling);
+    }
+  });
+
+  controls.addEventListener('delete', () => {
+    component.remove();
+  });
+
+  createDraggable(component, {
+    data: payload,
+    onDragStart: () => component.classList.add('dragging'),
+    onDragEnd: () => component.classList.remove('dragging')
+  });
+
+  return component;
+}
+
+// Обновляем обработчик onDrop
 createDropZone(dropzone, {
   accept: () => true,
   onHover: (event) => {
@@ -17,7 +71,6 @@ createDropZone(dropzone, {
       x: event.position.x,
       y: event.position.y
     });
-
     dropzone.classList.add('hover');
   },
   onHoverEnd: () => {
@@ -35,20 +88,7 @@ createDropZone(dropzone, {
     if (isExistingComponent) {
       sortableManager.insertElement(event.source, dropPosition.index, dropPosition.where);
     } else {
-      const component = document.createElement('div');
-      component.className = 'dropped-component';
-      component.dataset.type = event.payload.type;
-      component.innerHTML = `
-        <strong>${event.payload.type}</strong>
-        <p>${event.payload.content}</p>
-      `;
-
-      createDraggable(component, {
-        data: event.payload,
-        onDragStart: () => component.classList.add('dragging'),
-        onDragEnd: () => component.classList.remove('dragging')
-      });
-
+      const component = createComponent(event.payload);
       sortableManager.insertElement(component, dropPosition.index, dropPosition.where);
     }
 
