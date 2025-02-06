@@ -27,6 +27,11 @@ export interface DraggableConfig<T = any> {
   onDragEnd?: (event: DragEvent<T>) => void;
   dragHandle?: string;
   disabled?: boolean;
+  preview?: {
+    render?: (data: T) => HTMLElement;
+    offset?: { x: number; y: number };
+    className?: string;
+  };
 }
 
 export interface DropZoneConfig<T = any> {
@@ -42,6 +47,7 @@ export interface DragState<T = any> {
   source: HTMLElement | null;
   payload: T | null;
   position: Position | null;
+  previewElement: HTMLElement | null;
 }
 
 export interface DropZoneState {

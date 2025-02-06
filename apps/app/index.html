@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DnD Page Builder Demo</title>
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <style>
     * {
       box-sizing: border-box;
@@ -38,7 +39,7 @@
       border-radius: 8px;
       padding: 20px;
       margin-bottom: 16px;
-      cursor: move;
+      cursor: grab;
       user-select: none;
       transition: transform 0.2s, box-shadow 0.2s;
     }
@@ -49,29 +50,110 @@
     }
 
     .component.dragging {
-      opacity: 0.5;
+      opacity: 0.4;
+    }
+
+    .component:active {
+      cursor: grabbing;
     }
 
     .dropzone {
-      min-height: 200px;
+      position: relative;
+      min-height: 100px;
+      padding: 20px;
+      background: #fff;
       border: 2px dashed #e0e0e0;
       border-radius: 8px;
-      background: #fff;
-      padding: 20px;
-      transition: background-color 0.2s;
     }
 
-    .dropzone.hover {
-      background: #f0f7ff;
-      border-color: #2196f3;
+    .drop-indicator {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      height: 4px;
+      background: #2196f3;
+      border-radius: 2px;
+      display: none;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 0 8px rgba(33, 150, 243, 0.5);
     }
 
     .dropped-component {
-      background: #fff;
+      position: relative;
+      margin: 10px 0;
+      padding: 20px;
+      background: white;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
+      cursor: grab;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .dropped-component.drop-target {
+      border-color: #2196f3;
+      background: #f0f7ff;
+    }
+
+    .dropped-component.dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+
+    .drop-indicator.insert-before {
+      top: -2px !important;
+    }
+
+    .drop-indicator.insert-after {
+      bottom: -2px !important;
+    }
+
+    .dropzone.hover {
+      border-color: #2196f3;
+      background: #f5f5f5;
+    }
+
+    .dropped-component:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .dragging-preview {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+      background: white;
+      border: 2px solid #2196f3;
+      border-radius: 8px;
       padding: 20px;
-      margin-bottom: 16px;
+      width: 300px;
+      box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+      opacity: 0.9;
+      margin: 0;
+      cursor: grabbing;
+    }
+
+    @keyframes indicator-appear {
+      from {
+        transform: scaleX(0);
+        opacity: 0;
+      }
+      to {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes preview-appear {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      to {
+        opacity: 0.9;
+        transform: scale(1);
+      }
     }
   </style>
 </head>

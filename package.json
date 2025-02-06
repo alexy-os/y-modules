@@ -12,7 +12,9 @@
     "build:app": "bun run --cwd apps/app build",
     "test": "bun test",
     "dev": "bun run dev:app",
-    "dev:app": "bun run --cwd apps/app dev"
+    "dev:app": "bun run --cwd apps/app dev",
+    "preview": "bun run preview:app",
+    "preview:app": "bun run --cwd apps/app preview"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",

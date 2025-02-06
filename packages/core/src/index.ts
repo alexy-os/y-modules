@@ -1,13 +1,23 @@
 import { DndManager } from './DndManager';
-export * from './types';
-export { DndManager };
+import { SortableManager } from './SortableManager';
+import type { DraggableConfig, DropZoneConfig } from './types';
 
-// Helper functions for easy setup
-export function createDraggable(element: HTMLElement, config: import('./types').DraggableConfig): () => void {
-  return DndManager.getInstance().registerDraggable(element, config);
+// Экспортируем DndManager для возможного прямого использования
+export { DndManager };
+export { SortableManager };
+
+// Инициализируем менеджер сразу
+const manager = DndManager.getInstance();
+
+// Экспортируем типы
+export * from './types';
+
+// Экспортируем функции как именованные экспорты
+export function createDraggable(element: HTMLElement, config: DraggableConfig): () => void {
+  return manager.registerDraggable(element, config);
 }
 
-export function createDropZone(element: HTMLElement, config: import('./types').DropZoneConfig): () => void {
+export function createDropZone(element: HTMLElement, config: DropZoneConfig): () => void {
   element.setAttribute('data-dropzone', '');
-  return DndManager.getInstance().registerDropZone(element, config);
+  return manager.registerDropZone(element, config);
 } 

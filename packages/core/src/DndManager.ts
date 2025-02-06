@@ -1,17 +1,27 @@
 import { Position, DragEvent, DropEvent, DragState, DropZoneState, DraggableConfig, DropZoneConfig } from './types';
 
+interface DndAdapter {
+  initialize(): void;
+  destroy(): void;
+  onDragStart?: (callback: (event: DragEvent) => void) => void;
+  onDrop?: (callback: (event: DropEvent) => void) => void;
+  // ... другие методы
+}
+
 export class DndManager {
   private static instance: DndManager;
   private dragState: DragState = {
     isDragging: false,
     source: null,
     payload: null,
-    position: null
+    position: null,
+    previewElement: null
   };
   private dropZones = new WeakMap<HTMLElement, DropZoneConfig>();
   private draggables = new WeakMap<HTMLElement, DraggableConfig>();
   private positions = new WeakMap<HTMLElement, DOMRect>();
   private observer: IntersectionObserver;
+  private currentConfig: DraggableConfig | null = null;
 
   private constructor() {
     this.observer = new IntersectionObserver(
@@ -86,7 +96,8 @@ export class DndManager {
       isDragging: true,
       source: element,
       payload: config.data,
-      position
+      position,
+      previewElement: null
     };
 
     const event: DragEvent = {
@@ -99,6 +110,13 @@ export class DndManager {
 
     config.onDragStart?.(event);
     element.classList.add('dragging');
+
+    // Create and add preview
+    this.dragState.previewElement = this.createPreviewElement(config, this.dragState.payload);
+    this.updatePreviewPosition(this.dragState.position!);
+
+    // Сохраняем текущую конфигурацию
+    this.currentConfig = config;
   }
 
   private handleMouseMove(e: MouseEvent): void {
@@ -113,9 +131,11 @@ export class DndManager {
   }
 
   private handleMove(e: MouseEvent | TouchEvent): void {
-    if (!this.dragState.source) return;
+    if (!this.dragState.isDragging || !this.dragState.source) return;
 
     const position = this.getEventPosition(e);
+    this.dragState.position = position;
+
     const config = this.draggables.get(this.dragState.source);
     
     if (config) {
@@ -130,10 +150,14 @@ export class DndManager {
       config.onDragMove?.(event);
     }
 
+    // Используем общий метод для обновления позиции
+    this.updatePreviewPosition(position);
     this.checkDropZones(position, e);
   }
 
   private checkDropZones(position: Position, originalEvent: MouseEvent | TouchEvent): void {
+    const activeDropZones = new Set<HTMLElement>();
+    
     Array.from(this.getDropZoneEntries()).forEach(([element, config]: [HTMLElement, DropZoneConfig]) => {
       if (config.disabled) return;
 
@@ -141,6 +165,7 @@ export class DndManager {
       const isOver = this.isPositionInRect(position, rect);
 
       if (isOver && this.dragState.source) {
+        activeDropZones.add(element);
         const event: DropEvent = {
           type: 'hover',
           source: this.dragState.source,
@@ -153,6 +178,16 @@ export class DndManager {
         if (config.accept?.(this.dragState.payload!) !== false) {
           config.onHover?.(event);
         }
+      } else if (this.dragState.source) {
+        const event: DropEvent = {
+          type: 'hover',
+          source: this.dragState.source,
+          target: element,
+          payload: this.dragState.payload!,
+          position,
+          originalEvent
+        };
+        config.onHoverEnd?.(event);
       }
     });
   }
@@ -172,6 +207,11 @@ export class DndManager {
 
     const position = this.getEventPosition(e);
     const dragConfig = this.draggables.get(this.dragState.source);
+
+    // Удаляем preview элемент
+    if (this.dragState.previewElement) {
+      this.dragState.previewElement.remove();
+    }
 
     Array.from(this.getDropZoneEntries()).forEach(([element, dropConfig]: [HTMLElement, DropZoneConfig]) => {
       if (dropConfig.disabled) return;
@@ -210,12 +250,20 @@ export class DndManager {
   }
 
   private resetDragState(): void {
+    // Убеждаемся, что preview элемент удален
+    if (this.dragState.previewElement) {
+      this.dragState.previewElement.remove();
+    }
+
     this.dragState = {
       isDragging: false,
       source: null,
       payload: null,
-      position: null
+      position: null,
+      previewElement: null
     };
+    
+    this.currentConfig = null;
   }
 
   private getEventPosition(e: MouseEvent | TouchEvent): Position {
@@ -245,4 +293,72 @@ export class DndManager {
       }
     }
   }
+
+  private createPreviewElement(config: DraggableConfig, data: any): HTMLElement {
+    let preview: HTMLElement;
+    
+    if (config.preview?.render) {
+      preview = config.preview.render(data);
+    } else {
+      preview = this.dragState.source!.cloneNode(true) as HTMLElement;
+    }
+
+    // Базовые стили без анимаций
+    preview.className = config.preview?.className || 'dragging-preview';
+    preview.style.position = 'fixed';
+    preview.style.pointerEvents = 'none';
+    preview.style.zIndex = '1000';
+    preview.style.margin = '0';
+    preview.style.cursor = 'grabbing';
+    preview.style.left = '0';
+    preview.style.top = '0';
+
+    document.body.appendChild(preview);
+
+    // Используем общий метод для начального позиционирования
+    if (this.dragState.position) {
+      this.updatePreviewPosition(this.dragState.position);
+    }
+
+    return preview;
+  }
+
+  private updatePreviewPosition(position: Position): void {
+    if (!this.dragState.previewElement) return;
+
+    const rect = this.dragState.previewElement.getBoundingClientRect();
+    // Всегда центрируем превью относительно курсора
+    this.dragState.previewElement.style.left = `${position.x - (rect.width / 2)}px`;
+    this.dragState.previewElement.style.top = `${position.y - (rect.height / 2)}px`;
+  }
+
+  private handleDragEnd(): void {
+    if (this.dragState.previewElement) {
+      this.dragState.previewElement.remove();
+    }
+
+    // ... rest of drag end code ...
+    
+    // Очищаем текущую конфигурацию
+    this.currentConfig = null;
+    
+    this.dragState = {
+      isDragging: false,
+      source: null,
+      payload: null,
+      position: null,
+      previewElement: null
+    };
+  }
+}
+
+abstract class BaseDndAdapter implements DndAdapter {
+  protected manager: DndManager;
+  
+  constructor() {
+    this.manager = DndManager.getInstance();
+  }
+  
+  abstract initialize(): void;
+  abstract destroy(): void;
 } 

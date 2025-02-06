@@ -8,8 +8,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
-      '@y-modules/core': resolve(__dirname, '../../packages/core/src')
-    }
+      '@y-modules/core': resolve(__dirname, '../../packages/core/src/index.ts'),
+    },
+  },
+  optimizeDeps: {
+    include: ['@y-modules/core'],
+    force: true
   },
   build: {
     outDir: 'dist',
@@ -18,9 +22,9 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html')
       }
-    }
+    },
+    commonjsOptions: {
+      include: [/@y-modules\/core/, /node_modules/],
+    },
   },
-  optimizeDeps: {
-    include: ['@y-modules/core']
-  }
 }); 
